@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Afacad_Flux } from "next/font/google";
 
 import "./globals.css";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 const afacadFlux = Afacad_Flux({
   variable: "--font-afacad-flux",
@@ -15,14 +18,25 @@ export const metadata: Metadata = {
     "A simple tool to upload and preview README files in your browser",
 };
 
-export default function RootLayout({
+export default async function Layout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+
   return (
     <html lang="en">
-      <body className={`${afacadFlux.className} antialiased`}>{children}</body>
+      <body className={`${afacadFlux.className} antialiased`}>
+        <SidebarProvider defaultOpen={defaultOpen}>
+          <AppSidebar />
+          <main>
+            <SidebarTrigger />
+            <div className="p-2">{children}</div>
+          </main>
+        </SidebarProvider>
+      </body>
     </html>
   );
 }
