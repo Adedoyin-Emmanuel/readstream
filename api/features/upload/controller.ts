@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import response from "../../utils/response";
-import UploadQueue, { IFileInfo } from "./../../jobs/upload/upload";
+import UploadQueue, { IFileInfo } from "../../jobs/upload/upload.queue";
 
 export default class UploadController {
   private static readonly _uploadQueue = new UploadQueue();
