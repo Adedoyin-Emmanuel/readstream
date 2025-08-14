@@ -1,14 +1,18 @@
+import { Worker } from "bullmq";
+
 import { logger } from "../../utils";
+import { IJob } from "../i-jobs-worker";
 
-import { Worker, Job } from "bullmq";
-
-export default class UploadWorker {
+export default class UploadWorker implements IJob {
   private _worker: Worker;
 
   constructor() {
     this._worker = new Worker("uploads", async (job) => {
       logger(`Processing job ${job.id}`);
     });
+  }
+  process(): void {
+    throw new Error("Method not implemented.");
   }
 
   public start() {
