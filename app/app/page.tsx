@@ -5,7 +5,7 @@ import FileUpload from "./components/file-upload";
 const App = () => {
   return (
     <div>
-      <h1>App</h1>
+      <h1 className="text-lg py-4 ">Chairman, upload your README.md file</h1>
       <FileUpload />
     </div>
   );
