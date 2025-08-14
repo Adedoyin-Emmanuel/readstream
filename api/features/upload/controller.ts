@@ -1,4 +1,3 @@
-import fs from "fs";
 import { Request, Response } from "express";
 
 import response from "../../utils/response";
@@ -10,10 +9,6 @@ export default class UploadController {
 
       if (!file) {
         return response(res, 400, "No file uploaded");
-      }
-
-      if (!req.storage) {
-        return response(res, 500, "Storage service not available");
       }
 
       const filePath = await req.storage.uploadFile(file);

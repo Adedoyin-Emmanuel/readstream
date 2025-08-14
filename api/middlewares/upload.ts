@@ -2,13 +2,17 @@ import multer from "multer";
 import { Request, Response, NextFunction } from "express";
 
 import {
+  LIMIT_FILE_SIZE,
+  UNSUPPORTED_FILE_TYPE,
+  MULTIPLE_FILES_NOT_SUPPORTED,
+} from "../constants/errors";
+import {
   MAX_FILE_SIZE,
   ALLOWED_FILE_UPLOAD_EXTENSIONS,
 } from "../constants/app";
 import { logger } from "../utils/";
 import response from "../utils/response";
 import localStorage from "../services/upload";
-import { LIMIT_FILE_SIZE, UNSUPPORTED_FILE_TYPE } from "../constants/errors";
 
 declare global {
   namespace Express {
@@ -22,15 +26,37 @@ declare global {
 
 const storage = multer.memoryStorage();
 
-const useFileSizeLimit = async (
+const useFileValidation = async (
   error: any,
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ) => {
-  if (error.code === "LIMIT_FILE_SIZE") {
-    return response(res, 413, LIMIT_FILE_SIZE);
+  if (error) {
+    switch (error.code) {
+      case "LIMIT_UNEXPECTED_FILE":
+        return response(res, 400, MULTIPLE_FILES_NOT_SUPPORTED);
+
+      case "LIMIT_FILE_SIZE":
+        return response(res, 413, LIMIT_FILE_SIZE);
+
+      case "UNSUPPORTED_FILE_TYPE":
+        return response(res, 400, UNSUPPORTED_FILE_TYPE);
+
+      default:
+        return response(res, 400, error.message);
+    }
   }
+
+  if (!req.file) {
+    return response(res, 400, "No file uploaded");
+  }
+
+  if (Array.isArray(req.files) && req.files.length > 1) {
+    return response(res, 400, "Multiple files are not supported");
+  }
+
+  next();
 };
 
 const fileFilter = async (req: Request, file: Express.Multer.File, cb: any) => {
@@ -70,4 +96,4 @@ const useFileUpload = async (
   }
 };
 
-export { useFileUpload, upload, useFileSizeLimit };
+export { useFileUpload, upload, useFileValidation };

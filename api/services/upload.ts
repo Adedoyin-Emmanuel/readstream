@@ -8,7 +8,7 @@ export default async function localStorage() {
   return {
     async uploadFile(file: Express.Multer.File) {
       try {
-        const uploadDir = path.join(__dirname, "uploads");
+        const uploadDir = path.join(__dirname, "..", "uploads");
         const fileExtension = file?.originalname
           ?.split(".")
           ?.pop()

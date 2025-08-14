@@ -3,7 +3,7 @@ import { Router } from "express";
 import {
   upload,
   useFileUpload,
-  useFileSizeLimit,
+  useFileValidation,
 } from "../../middlewares/upload";
 import UploadController from "./controller";
 
@@ -11,7 +11,7 @@ const router = Router();
 
 router.post(
   "/",
-  [useFileUpload, upload.single("file"), useFileSizeLimit],
+  [upload.single("file"), useFileValidation, useFileUpload],
   UploadController.uploadFile
 );
 
