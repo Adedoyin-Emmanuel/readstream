@@ -1,6 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import cors from "cors";
 import morgan from "morgan";
-import dotenv from "dotenv";
 import helmet from "helmet";
 import express from "express";
 import "express-async-errors";
@@ -14,8 +16,6 @@ import baseRouter from "./features/base/route";
 
 import uploadRouter from "./features/upload/route";
 import { useErrorHandler, useNotFound } from "./middlewares/";
-
-dotenv.config();
 
 const app = express();
 
