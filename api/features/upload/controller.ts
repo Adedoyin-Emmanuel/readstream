@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import response from "../../utils/response";
 import UploadQueue from "../../jobs/upload/upload.queue";
 import { uploadRepository } from "../../repositories/upload/upload-repository";
+import socketService from "../../services/socket";
 
 export default class UploadController {
   private static readonly _uploadQueue = new UploadQueue();
@@ -29,6 +30,13 @@ export default class UploadController {
       });
 
       await this._uploadQueue.add(newUpload);
+
+      // Emit upload started event to the room
+      socketService.emitToRoom(`upload:${newUpload._id}`, "upload:started", {
+        uploadId: newUpload._id,
+        fileName: newUpload.fileName,
+        status: "pending",
+      });
 
       return response(res, 200, "File uploaded successfully", newUpload);
     } catch (error) {

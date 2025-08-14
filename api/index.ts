@@ -14,6 +14,7 @@ import JobsConfig from "./jobs/jobs-config";
 import { connectToDatabase } from "./utils";
 import corsOptions from "./utils/cors-options";
 import baseRouter from "./features/base/route";
+import socketService from "./services/socket";
 
 import uploadRouter from "./features/upload/route";
 import { useErrorHandler, useNotFound } from "./middlewares/";
@@ -35,6 +36,9 @@ app.use(useErrorHandler);
 
 export const server = app.listen(PORT, async () => {
   await connectToDatabase();
+
+  // Initialize Socket.IO
+  socketService.initialize(server);
 
   const allJobs = new JobsConfig();
 

@@ -4,6 +4,7 @@ import { Job, Worker } from "bullmq";
 
 import { logger } from "../../utils";
 import { IJob } from "../i-jobs-worker";
+import socketService from "../../services/socket";
 import { FileProcessingStatus } from "../../models/upload";
 import { uploadRepository } from "../../repositories/upload/upload-repository";
 
@@ -40,7 +41,11 @@ export default class UploadWorker implements IJob {
           status: FileProcessingStatus.PROCESSING,
         });
 
-        // Emit event to the client
+        socketService.emitToRoom(`upload:${upload._id}`, "upload:processing", {
+          uploadId: upload._id,
+          fileName: upload.fileName,
+          status: FileProcessingStatus.PROCESSING,
+        });
         break;
       case FileProcessingStatus.PROCESSING:
         logger(`Upload ${upload._id} is already being processed`);
@@ -62,24 +67,41 @@ export default class UploadWorker implements IJob {
       status: FileProcessingStatus.COMPLETED,
       htmlContent: htmlContent,
     });
+
+    socketService.emitToRoom(`upload:${upload._id}`, "upload:completed", {
+      uploadId: upload._id,
+      htmlContent: htmlContent,
+      fileName: upload.fileName,
+      status: FileProcessingStatus.COMPLETED,
+    });
   }
 
   public start() {
     logger("Starting upload worker");
 
     this._worker.on("completed", (job) => {
-        logger(`Job ${job.id} completed successfully`);
-      //emit event
+      logger(`Job ${job.id} completed successfully`);
     });
 
-    this._worker.on("failed", (job, err) => {
-        logger(`Job ${job?.id} failed: ${err.message}`);
-        //emit event
+    this._worker.on("failed", async (job, err) => {
+      logger(`Job ${job?.id} failed: ${err.message}`);
+
+      if (job?.data?._id) {
+        socketService.emitToRoom(`upload:${job.data._id}`, "upload:failed", {
+          uploadId: job.data._id,
+          error: err.message,
+        });
+      }
+
+      if (job?.data?._id) {
+        await uploadRepository.update(job.data._id, {
+          status: FileProcessingStatus.FAILED,
+        });
+      }
     });
 
     this._worker.on("error", (err) => {
       logger(`Worker error: ${err.message}`);
-      //emit event
     });
   }
 }
