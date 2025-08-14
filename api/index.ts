@@ -37,7 +37,6 @@ app.use(useErrorHandler);
 export const server = app.listen(PORT, async () => {
   await connectToDatabase();
 
-  // Initialize Socket.IO
   socketService.initialize(server);
 
   const allJobs = new JobsConfig();

@@ -1,5 +1,7 @@
-import { Server as SocketIOServer } from "socket.io";
 import { Server as HTTPServer } from "http";
+import { Server as SocketIOServer } from "socket.io";
+
+import { logger } from "../utils";
 
 export class SocketService {
   private static instance: SocketService;
@@ -23,24 +25,22 @@ export class SocketService {
     });
 
     this.io.on("connection", (socket) => {
-      console.log(`Client connected: ${socket.id}`);
+      logger(`Client connected: ${socket.id}`);
 
-      // Handle joining upload rooms
       socket.on("join:upload", (uploadId: string) => {
         const room = `upload:${uploadId}`;
         socket.join(room);
-        console.log(`Client ${socket.id} joined room: ${room}`);
+        logger(`Client ${socket.id} joined room: ${room}`);
       });
 
-      // Handle leaving upload rooms
       socket.on("leave:upload", (uploadId: string) => {
         const room = `upload:${uploadId}`;
         socket.leave(room);
-        console.log(`Client ${socket.id} left room: ${room}`);
+        logger(`Client ${socket.id} left room: ${room}`);
       });
 
       socket.on("disconnect", () => {
-        console.log(`Client disconnected: ${socket.id}`);
+        logger(`Client disconnected: ${socket.id}`);
       });
     });
   }
