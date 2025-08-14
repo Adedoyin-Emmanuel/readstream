@@ -56,6 +56,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
     [handleFileSelect]
   );
 
+  const handleRemoveFile = useCallback(() => {
+    setSelectedFile(null);
+    const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  }, []);
+
   return (
     <div className="w-full mx-auto">
       <div
@@ -93,7 +101,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
         </div>
       </div>
 
-      {selectedFile && <FileDisplay file={selectedFile} />}
+      {selectedFile && (
+        <FileDisplay file={selectedFile} onRemove={handleRemoveFile} />
+      )}
     </div>
   );
 };
