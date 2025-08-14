@@ -39,6 +39,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@typegoose/typegoose": "^12.18.0",
     "axios": "^1.10.0",
     "body-parser": "^2.2.0",
     "bullmq": "^5.57.0",
@@ -53,6 +54,7 @@
     "got-scraping": "^4.1.1",
     "helmet": "^8.1.0",
     "joi": "^17.13.3",
+    "mongoose": "^8.17.1",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "redis": "^5.8.1",
