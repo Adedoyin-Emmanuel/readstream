@@ -1,5 +1,5 @@
 import debug from "debug";
 
-const logger = debug("app:logger");
+const logger = debug("readstream");
 
 export default logger;

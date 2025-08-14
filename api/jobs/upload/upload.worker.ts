@@ -7,9 +7,17 @@ export default class UploadWorker implements IJob {
   private _worker: Worker;
 
   constructor() {
-    this._worker = new Worker("uploads", async (job) => {
-      logger(`Processing job ${job.id}`);
-    });
+    this._worker = new Worker(
+      "uploads",
+      async (job) => {
+        logger(`Processing job ${job.id}`);
+      },
+      {
+        connection: {
+          url: process.env.REDIS_URL,
+        },
+      }
+    );
   }
   process(): void {
     throw new Error("Method not implemented.");
