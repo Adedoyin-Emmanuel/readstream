@@ -7,7 +7,7 @@ export default class UploadQueue {
   private readonly _queue: Queue;
 
   constructor() {
-    this._queue = new Queue("upload", {
+    this._queue = new Queue("uploads", {
       connection: {
         url: process.env.REDIS_URL,
       },

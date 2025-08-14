@@ -17,7 +17,7 @@ export default async function localStorage() {
         const filePath = path.join(uploadDir, newFileName);
         await fs.promises.mkdir(uploadDir, { recursive: true });
         await fs.promises.writeFile(filePath, file.buffer);
-        return `/files/${newFileName}`;
+        return `/uploads/${newFileName}`;
       } catch (error) {
         logger(error.message);
       }

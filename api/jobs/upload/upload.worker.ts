@@ -1,7 +1,11 @@
+import fs from "fs";
+import path from "path";
 import { Job, Worker } from "bullmq";
 
 import { logger } from "../../utils";
 import { IJob } from "../i-jobs-worker";
+import { FileProcessingStatus } from "../../models/upload";
+import { uploadRepository } from "../../repositories/upload/upload-repository";
 
 export default class UploadWorker implements IJob {
   private _worker: Worker;
@@ -11,6 +15,9 @@ export default class UploadWorker implements IJob {
       "uploads",
       async (job) => {
         logger(`Processing job ${job.id}`);
+        logger(`Job data: ${JSON.stringify(job.data)}`);
+
+        await this.process(job);
       },
       {
         connection: {
@@ -19,11 +26,60 @@ export default class UploadWorker implements IJob {
       }
     );
   }
-  process(job: Job) {
-    throw new Error("Method not implemented.");
+
+  async process(job: Job) {
+    const upload = await uploadRepository.findById(job.data._id);
+
+    if (!upload) {
+      throw new Error("Upload not found");
+    }
+
+    switch (upload.status) {
+      case FileProcessingStatus.PENDING:
+        await uploadRepository.update(upload._id, {
+          status: FileProcessingStatus.PROCESSING,
+        });
+
+        // Emit event to the client
+        break;
+      case FileProcessingStatus.PROCESSING:
+        logger(`Upload ${upload._id} is already being processed`);
+        break;
+      case FileProcessingStatus.COMPLETED:
+        logger(`Upload ${upload._id} is already completed`);
+        break;
+      default:
+        throw new Error("Invalid upload status");
+    }
+
+    const absolutePath = path.join(__dirname, "..", "..", upload.path);
+    const file = fs.readFileSync(absolutePath, "utf8");
+
+    const { marked } = await import("marked");
+    const htmlContent = await marked.parse(file);
+
+    await uploadRepository.update(upload._id, {
+      status: FileProcessingStatus.COMPLETED,
+      htmlContent: htmlContent,
+    });
   }
 
   public start() {
     logger("Starting upload worker");
+
+    this._worker.on("completed", (job) => {
+        logger(`Job ${job.id} completed successfully`);
+      //emit event
+    });
+
+    this._worker.on("failed", (job, err) => {
+        logger(`Job ${job?.id} failed: ${err.message}`);
+        //emit event
+    });
+
+    this._worker.on("error", (err) => {
+      logger(`Worker error: ${err.message}`);
+      //emit event
+    });
   }
 }
