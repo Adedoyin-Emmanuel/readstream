@@ -11,4 +11,24 @@ export default class RedisService {
       await redisClient.set(key, stringValues);
     }
   }
+
+  async get<T>(key: string): Promise<T | null> {
+    const data = await redisClient.get(key);
+    if (data === null) return null;
+
+    const stringData = data.toString();
+    try {
+      return JSON.parse(stringData) as T;
+    } catch {
+      return stringData as T;
+    }
+  }
+
+  async del(key: string): Promise<number> {
+    return Number(await redisClient.del(key));
+  }
+
+  async exists(key: string): Promise<boolean> {
+    return (await redisClient.exists(key)) === 1;
+  }
 }
