@@ -9,6 +9,8 @@ import bodyParser from "body-parser";
 import { PORT } from "./constants/app";
 import corsOptions from "./utils/cors-options";
 import baseRouter from "./features/base/route";
+
+import uploadRouter from "./features/upload/route";
 import { useErrorHandler, useNotFound } from "./middlewares/";
 
 dotenv.config();
@@ -23,6 +25,7 @@ app.use(helmet());
 app.use(bodyParser.json({ limit: "1mb" }));
 
 app.use("/v1", baseRouter);
+app.use("/v1/upload", uploadRouter);
 
 app.use(useNotFound);
 app.use(useErrorHandler);
