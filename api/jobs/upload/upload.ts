@@ -2,11 +2,15 @@ import { Queue } from "bullmq";
 
 import { logger } from "../../utils";
 
-interface IUploadJobData {
-  fileId: string;
+export interface IFileInfo {
+  size: number;
+  path: string;
+  mimeType: string;
+  filename: string;
+  uploadedAt: string;
 }
 
-export default class UploadJob {
+export default class UploadQueue {
   private readonly _queue: Queue;
 
   constructor() {
@@ -17,10 +21,10 @@ export default class UploadJob {
     });
   }
 
-  public async add(data: IUploadJobData) {
+  public async add(data: IFileInfo) {
     await this._queue.add("upload", data);
 
-    logger(`Add document ${data.fileId} to processing queue`);
+    logger(`Add document ${data.filename} to processing queue`);
   }
 
   public async remove(fileId: string) {
