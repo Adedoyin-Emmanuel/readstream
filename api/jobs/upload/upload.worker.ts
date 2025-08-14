@@ -1,4 +1,4 @@
-import { Worker } from "bullmq";
+import { Job, Worker } from "bullmq";
 
 import { logger } from "../../utils";
 import { IJob } from "../i-jobs-worker";
@@ -19,7 +19,7 @@ export default class UploadWorker implements IJob {
       }
     );
   }
-  process(): void {
+  process(job: Job) {
     throw new Error("Method not implemented.");
   }
 

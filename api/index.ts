@@ -11,6 +11,7 @@ import bodyParser from "body-parser";
 import { redisClient } from "./utils";
 import { PORT } from "./constants/app";
 import JobsConfig from "./jobs/jobs-config";
+import { connectToDatabase } from "./utils";
 import corsOptions from "./utils/cors-options";
 import baseRouter from "./features/base/route";
 
@@ -33,6 +34,8 @@ app.use(useNotFound);
 app.use(useErrorHandler);
 
 export const server = app.listen(PORT, async () => {
+  await connectToDatabase();
+
   const allJobs = new JobsConfig();
 
   await redisClient.connect();

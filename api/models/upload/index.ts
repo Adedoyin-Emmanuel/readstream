@@ -31,7 +31,7 @@ class Upload {
   htmlContent: string;
 
   @prop({ required: true, default: FileProcessingStatus.PENDING })
-  status: FileProcessingStatus;
+  status?: FileProcessingStatus;
 }
 
 const UploadModel = getModelForClass(Upload);

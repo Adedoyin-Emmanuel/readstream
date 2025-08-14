@@ -1,14 +1,7 @@
 import { Queue } from "bullmq";
 
 import { logger } from "../../utils";
-
-export interface IFileInfo {
-  size: number;
-  path: string;
-  mimeType: string;
-  filename: string;
-  uploadedAt: string;
-}
+import { Upload } from "../../models/upload";
 
 export default class UploadQueue {
   private readonly _queue: Queue;
@@ -21,10 +14,10 @@ export default class UploadQueue {
     });
   }
 
-  public async add(data: IFileInfo) {
+  public async add(data: Upload) {
     await this._queue.add("upload", data);
 
-    logger(`Add document ${data.filename} to processing queue`);
+    logger(`Add document ${data._id} to processing queue`);
   }
 
   public async remove(fileId: string) {

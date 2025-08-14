@@ -12,7 +12,7 @@ const router = Router();
 router.post(
   "/",
   [upload.single("file"), useFileValidation, useFileUpload],
-  UploadController.uploadFile
+  (req, res) => UploadController.uploadFile(req, res)
 );
 
 export default router;
