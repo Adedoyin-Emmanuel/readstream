@@ -1,22 +1,25 @@
 "use client";
 
 import { Upload } from "lucide-react";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import FileDisplay from "./file-display";
 import UploadProgressComponent from "./upload-progress";
-import { uploadFile, UploadProgress } from "../services/upload-service";
+import { uploadFile, UploadProgress, UploadResponse } from "../services/upload-service";
+import { useUploadStatus } from "../hooks/use-upload-status";
 
 interface FileUploadProps {
   onFileSelect?: (file: File) => void;
-  onUploadComplete?: (response: unknown) => void;
+  onUploadComplete?: (response: UploadResponse) => void;
   onUploadError?: (error: unknown) => void;
+  onUploadStatusChange?: (status: string) => void;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({
   onFileSelect,
   onUploadComplete,
   onUploadError,
+  onUploadStatusChange,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -24,6 +27,17 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
     null
   );
+  const { uploadStatus, joinUploadRoom, leaveUploadRoom, resetStatus } = useUploadStatus();
+
+  useEffect(() => {
+    if (uploadStatus) {
+      onUploadStatusChange?.(uploadStatus.status);
+      
+      if (uploadStatus.status === "completed" || uploadStatus.status === "failed") {
+        leaveUploadRoom(uploadStatus.uploadId);
+      }
+    }
+  }, [uploadStatus, onUploadStatusChange, leaveUploadRoom]);
 
   const handleUpload = useCallback(
     async (file: File) => {
@@ -37,7 +51,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
           setUploadProgress(progress);
         });
 
+        joinUploadRoom(response.data._id);
         onUploadComplete?.(response);
+        onUploadStatusChange?.("pending");
       } catch (error) {
         onUploadError?.(error);
       } finally {
@@ -45,7 +61,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         setUploadProgress(null);
       }
     },
-    [isUploading, onUploadComplete, onUploadError]
+    [isUploading, onUploadComplete, onUploadError, joinUploadRoom, onUploadStatusChange]
   );
 
   const handleFileSelect = useCallback(
@@ -106,11 +122,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
     if (isUploading) return;
 
     setSelectedFile(null);
+    resetStatus();
     const fileInput = document.getElementById("file-input") as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";
     }
-  }, [isUploading]);
+  }, [isUploading, resetStatus]);
 
   const handleClick = useCallback(() => {
     if (!isUploading) {

@@ -6,10 +6,22 @@ export interface UploadProgress {
   total: number;
 }
 
+export interface UploadResponse {
+  data: {
+    _id: string;
+    fileName: string;
+    path: string;
+    size: number;
+    status: string;
+  };
+  message: string;
+  status: number;
+}
+
 export const uploadFile = async (
   file: File,
   onProgress?: (progress: UploadProgress) => void
-): Promise<unknown> => {
+): Promise<UploadResponse> => {
   const formData = new FormData();
   formData.append("file", file);
 

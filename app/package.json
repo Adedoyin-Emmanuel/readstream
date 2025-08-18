@@ -25,6 +25,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-resizable-panels": "^3.0.4",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
