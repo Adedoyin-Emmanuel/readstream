@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 
 import { CheckCircle, FileText, Loader2, AlertCircle } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
 import { UploadStatus } from "../hooks/use-upload-status";
 
@@ -69,12 +70,7 @@ const HtmlCanvas: React.FC<HtmlCanvasProps> = ({
             <p className="text-sm text-gray-500">{uploadStatus.fileName}</p>
           </div>
         </div>
-        <button
-          onClick={onUploadAnother}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          Upload Another
-        </button>
+        <Button onClick={onUploadAnother}>Upload Another</Button>
       </div>
 
       <div className="flex-1 overflow-auto p-6">
@@ -114,41 +110,19 @@ const HtmlCanvas: React.FC<HtmlCanvasProps> = ({
         </p>
       </div>
 
-      <button
-        onClick={onUploadAnother}
-        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-      >
-        Try Again
-      </button>
+      <Button onClick={onUploadAnother}>Try Again</Button>
     </div>
   );
 
   const renderPendingState = () => (
     <div className="w-full h-full flex flex-col items-center justify-center space-y-6 p-8">
-      <div className="flex items-center space-x-3">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-        <span className="text-lg font-medium text-gray-700">
-          File Uploaded Successfully
-        </span>
-      </div>
-
-      <div className="text-center space-y-2">
-        <p className="text-gray-600">
-          Your README file has been uploaded and is queued for processing.
-        </p>
-        <p className="text-sm text-gray-500">
-          Please wait while we convert your markdown to HTML...
-        </p>
-      </div>
-
-      <div className="w-full max-w-md">
-        <div className="bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-600 h-2 rounded-full animate-pulse"
-            style={{ width: "60%" }}
-          ></div>
-        </div>
-      </div>
+      <h1 className="text-lg font-bold">Uploading your README...</h1>
+      <p className="text-sm text-gray-500">
+        Your README file is being uploaded and will be converted to HTML.
+      </p>
+      <Button onClick={onUploadAnother} className="w-full">
+        Try Again
+      </Button>
     </div>
   );
 
