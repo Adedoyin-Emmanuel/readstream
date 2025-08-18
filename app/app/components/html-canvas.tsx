@@ -123,7 +123,7 @@ const HtmlCanvas: React.FC<HtmlCanvasProps> = ({
         </span>
       </div>
 
-      <div className="w-full max-w-2xl space-y-4">
+      <div className="w-full space-y-4">
         <div className="bg-white rounded-lg border p-6 space-y-4">
           <Skeleton className="h-8 w-3/4" />
           <Skeleton className="h-4 w-full" />

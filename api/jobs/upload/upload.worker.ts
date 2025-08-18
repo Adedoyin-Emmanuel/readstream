@@ -29,6 +29,8 @@ export default class UploadWorker implements IJob {
   }
 
   async process(job: Job) {
+    throw new Error("test");
+
     const upload = await uploadRepository.findById(job.data._id);
 
     if (!upload) {
@@ -68,6 +70,8 @@ export default class UploadWorker implements IJob {
       htmlContent: htmlContent,
     });
 
+    //  await new Promise((resolve) => setTimeout(resolve, 10000));
+
     socketService.emitToRoom(`upload:${upload._id}`, "upload:completed", {
       uploadId: upload._id,
       htmlContent: htmlContent,
@@ -87,10 +91,22 @@ export default class UploadWorker implements IJob {
       logger(`Job ${job?.id} failed: ${err.message}`);
 
       if (job?.data?._id) {
+        // Emit to specific upload room
         socketService.emitToRoom(`upload:${job.data._id}`, "upload:failed", {
           uploadId: job.data._id,
+          fileName: job.data.fileName,
           error: err.message,
+          status: "failed",
         });
+
+        socketService.emitToRoom("uploads", "upload:failed", {
+          uploadId: job.data._id,
+          fileName: job.data.fileName,
+          error: err.message,
+          status: "failed",
+        });
+
+        logger(`Emitted upload:failed to rooms for upload ${job.data._id}`);
       }
 
       if (job?.data?._id) {
