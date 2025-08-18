@@ -62,6 +62,12 @@ export class SocketService {
     }
   }
 
+  public joinGeneralUploadsRoom(): void {
+    if (this.socket?.connected) {
+      this.socket.emit("join:uploads");
+    }
+  }
+
   public leaveUploadRoom(uploadId: string): void {
     if (this.socket?.connected) {
       this.socket.emit("leave:upload", uploadId);

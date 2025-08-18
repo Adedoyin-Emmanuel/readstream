@@ -31,8 +31,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
     null
   );
-  const { uploadStatus, joinUploadRoom, leaveUploadRoom, resetStatus } =
-    useUploadStatus();
+  const { uploadStatus, leaveUploadRoom, resetStatus } = useUploadStatus();
 
   useEffect(() => {
     if (uploadStatus) {
@@ -59,7 +58,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
           setUploadProgress(progress);
         });
 
-        joinUploadRoom(response.data._id);
         onUploadComplete?.(response);
         onUploadStatusChange?.("pending");
       } catch (error) {
@@ -69,13 +67,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         setUploadProgress(null);
       }
     },
-    [
-      isUploading,
-      onUploadComplete,
-      onUploadError,
-      joinUploadRoom,
-      onUploadStatusChange,
-    ]
+    [isUploading, onUploadComplete, onUploadError, onUploadStatusChange]
   );
 
   const handleFileSelect = useCallback(

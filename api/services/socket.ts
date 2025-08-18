@@ -27,6 +27,11 @@ export class SocketService {
     this.io.on("connection", (socket) => {
       logger(`Client connected: ${socket.id}`);
 
+      socket.on("join:uploads", () => {
+        socket.join("uploads");
+        logger(`Client ${socket.id} joined general uploads room`);
+      });
+
       socket.on("join:upload", (uploadId: string) => {
         const room = `upload:${uploadId}`;
         socket.join(room);

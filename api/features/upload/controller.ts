@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 
+import { logger } from "../../utils";
 import response from "../../utils/response";
 import socketService from "../../services/socket";
 import UploadQueue from "../../jobs/upload/upload.queue";
@@ -31,11 +32,23 @@ export default class UploadController {
 
     await this._uploadQueue.add(newUpload);
 
-    socketService.emitToRoom(`upload:${newUpload._id}`, "upload:started", {
+    const uploadEvent = {
       uploadId: newUpload._id,
       fileName: newUpload.fileName,
       status: FileProcessingStatus.PENDING,
-    });
+    };
+
+    socketService.emitToRoom("uploads", "upload:started", uploadEvent);
+    logger(
+      `Emitted upload:started to general room for upload ${newUpload._id}`
+    );
+
+    socketService.emitToRoom(
+      `upload:${newUpload._id}`,
+      "upload:started",
+      uploadEvent
+    );
+    logger(`Emitted upload:started to specific room upload:${newUpload._id}`);
 
     return response(res, 200, "File uploaded successfully", newUpload);
   }
