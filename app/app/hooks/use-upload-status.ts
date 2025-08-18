@@ -2,16 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import socketService, { UploadEvent } from "../services/socket-service";
 
 export interface UploadStatus {
-  uploadId: string;
-  fileName: string;
-  status: "pending" | "processing" | "completed" | "failed";
-  htmlContent?: string;
   error?: string;
+  fileName: string;
+  uploadId: string;
+  htmlContent?: string;
+  status: "pending" | "processing" | "completed" | "failed";
 }
 
 export const useUploadStatus = () => {
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus | null>(null);
 
   useEffect(() => {
     socketService.connect();
@@ -19,7 +19,7 @@ export const useUploadStatus = () => {
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
-    const socket = (socketService as any).socket;
+    const socket = socketService.getSocket();
     if (socket) {
       socket.on("connect", handleConnect);
       socket.on("disconnect", handleDisconnect);
@@ -36,22 +36,25 @@ export const useUploadStatus = () => {
 
   const handleUploadEvent = useCallback((event: UploadEvent) => {
     setUploadStatus({
+      error: event.error,
+      status: event.status,
       uploadId: event.uploadId,
       fileName: event.fileName,
-      status: event.status,
       htmlContent: event.htmlContent,
-      error: event.error,
     });
   }, []);
 
-  const joinUploadRoom = useCallback((uploadId: string) => {
-    socketService.joinUploadRoom(uploadId);
-    
-    socketService.onUploadEvent("upload:started", handleUploadEvent);
-    socketService.onUploadEvent("upload:processing", handleUploadEvent);
-    socketService.onUploadEvent("upload:completed", handleUploadEvent);
-    socketService.onUploadEvent("upload:failed", handleUploadEvent);
-  }, [handleUploadEvent]);
+  const joinUploadRoom = useCallback(
+    (uploadId: string) => {
+      socketService.joinUploadRoom(uploadId);
+
+      socketService.onUploadEvent("upload:started", handleUploadEvent);
+      socketService.onUploadEvent("upload:processing", handleUploadEvent);
+      socketService.onUploadEvent("upload:completed", handleUploadEvent);
+      socketService.onUploadEvent("upload:failed", handleUploadEvent);
+    },
+    [handleUploadEvent]
+  );
 
   const leaveUploadRoom = useCallback((uploadId: string) => {
     socketService.leaveUploadRoom(uploadId);

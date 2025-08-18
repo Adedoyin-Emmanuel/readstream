@@ -3,9 +3,13 @@
 import { Upload } from "lucide-react";
 import React, { useState, useCallback, useEffect } from "react";
 
+import {
+  uploadFile,
+  UploadResponse,
+  UploadProgress,
+} from "../services/upload-service";
 import FileDisplay from "./file-display";
 import UploadProgressComponent from "./upload-progress";
-import { uploadFile, UploadProgress, UploadResponse } from "../services/upload-service";
 import { useUploadStatus } from "../hooks/use-upload-status";
 
 interface FileUploadProps {
@@ -17,8 +21,8 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({
   onFileSelect,
-  onUploadComplete,
   onUploadError,
+  onUploadComplete,
   onUploadStatusChange,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -27,13 +31,17 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
     null
   );
-  const { uploadStatus, joinUploadRoom, leaveUploadRoom, resetStatus } = useUploadStatus();
+  const { uploadStatus, joinUploadRoom, leaveUploadRoom, resetStatus } =
+    useUploadStatus();
 
   useEffect(() => {
     if (uploadStatus) {
       onUploadStatusChange?.(uploadStatus.status);
-      
-      if (uploadStatus.status === "completed" || uploadStatus.status === "failed") {
+
+      if (
+        uploadStatus.status === "completed" ||
+        uploadStatus.status === "failed"
+      ) {
         leaveUploadRoom(uploadStatus.uploadId);
       }
     }
@@ -61,7 +69,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
         setUploadProgress(null);
       }
     },
-    [isUploading, onUploadComplete, onUploadError, joinUploadRoom, onUploadStatusChange]
+    [
+      isUploading,
+      onUploadComplete,
+      onUploadError,
+      joinUploadRoom,
+      onUploadStatusChange,
+    ]
   );
 
   const handleFileSelect = useCallback(

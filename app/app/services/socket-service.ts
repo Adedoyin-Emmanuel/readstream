@@ -1,11 +1,11 @@
 import { io, Socket } from "socket.io-client";
 
 export interface UploadEvent {
+  error?: string;
   uploadId: string;
   fileName: string;
-  status: "pending" | "processing" | "completed" | "failed";
   htmlContent?: string;
-  error?: string;
+  status: "pending" | "processing" | "completed" | "failed";
 }
 
 export class SocketService {
@@ -27,7 +27,7 @@ export class SocketService {
     if (this.socket?.connected) return;
 
     this.socket = io(
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:2800"
     );
 
     this.socket.on("connect", () => {
@@ -46,6 +46,14 @@ export class SocketService {
       this.socket.disconnect();
       this.socket = null;
     }
+  }
+
+  public isConnected(): boolean {
+    return this.socket?.connected || false;
+  }
+
+  public getSocket(): Socket | null {
+    return this.socket;
   }
 
   public joinUploadRoom(uploadId: string): void {
@@ -85,9 +93,9 @@ export class SocketService {
 
     const events = [
       "upload:started",
+      "upload:failed",
       "upload:processing",
       "upload:completed",
-      "upload:failed",
     ];
 
     events.forEach((event) => {
