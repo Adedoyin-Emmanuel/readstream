@@ -38,8 +38,6 @@ export default class UploadController {
       status: FileProcessingStatus.PENDING,
     };
 
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-
     socketService.emitToRoom("uploads", "upload:started", uploadEvent);
 
     logger(

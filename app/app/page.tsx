@@ -37,7 +37,7 @@ const App = () => {
           Chairman, upload your README.md file
         </h1>
 
-        <div className="bg-white rounded-lg shadow-sm border min-h-[600px]">
+        <div className="w-full">
           {showCanvas && uploadStatus ? (
             <HtmlCanvas
               uploadStatus={uploadStatus}

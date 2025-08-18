@@ -116,13 +116,38 @@ const HtmlCanvas: React.FC<HtmlCanvasProps> = ({
 
   const renderPendingState = () => (
     <div className="w-full h-full flex flex-col items-center justify-center space-y-6 p-8">
-      <h1 className="text-lg font-bold">Uploading your README...</h1>
-      <p className="text-sm text-gray-500">
+      <div className="flex items-center space-x-3">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        <span className="text-lg font-medium text-gray-700">
+          Processing your README...
+        </span>
+      </div>
+
+      <div className="w-full max-w-2xl space-y-4">
+        <div className="bg-white rounded-lg border p-6 space-y-4">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-4/5" />
+
+          <div className="space-y-2 mt-6">
+            <Skeleton className="h-6 w-1/2" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+
+          <div className="space-y-2 mt-6">
+            <Skeleton className="h-6 w-1/3" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        </div>
+      </div>
+
+      <p className="text-sm text-gray-500 text-center">
         Your README file is being uploaded and will be converted to HTML.
       </p>
-      <Button onClick={onUploadAnother} className="w-full">
-        Try Again
-      </Button>
     </div>
   );
 
