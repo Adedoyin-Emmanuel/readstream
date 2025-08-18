@@ -36,14 +36,19 @@ export const useUploadStatus = () => {
   );
 
   useEffect(() => {
+    console.log("🔌 Initializing socket connection in useUploadStatus hook");
     socketService.connect();
 
     const handleConnect = () => {
+      console.log("✅ Socket connected in useUploadStatus hook");
       setIsConnected(true);
       socketService.joinGeneralUploadsRoom();
     };
 
-    const handleDisconnect = () => setIsConnected(false);
+    const handleDisconnect = () => {
+      console.log("❌ Socket disconnected in useUploadStatus hook");
+      setIsConnected(false);
+    };
 
     const socket = socketService.getSocket();
     if (socket) {
@@ -52,16 +57,19 @@ export const useUploadStatus = () => {
       setIsConnected(socket.connected);
 
       if (socket.connected) {
+        console.log("🔗 Socket already connected, joining general room");
         socketService.joinGeneralUploadsRoom();
       }
     }
 
+    console.log("📡 Setting up upload event listeners");
     socketService.onUploadEvent("upload:started", handleUploadEvent);
     socketService.onUploadEvent("upload:processing", handleUploadEvent);
     socketService.onUploadEvent("upload:completed", handleUploadEvent);
     socketService.onUploadEvent("upload:failed", handleUploadEvent);
 
     return () => {
+      console.log("🧹 Cleaning up socket listeners");
       if (socket) {
         socket.off("connect", handleConnect);
         socket.off("disconnect", handleDisconnect);

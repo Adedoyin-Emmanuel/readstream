@@ -26,16 +26,27 @@ export class SocketService {
   public connect(): void {
     if (this.socket?.connected) return;
 
-    this.socket = io(
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:2800"
-    );
+    const socketUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:2800";
 
-    this.socket.on("connect", () => {
-      console.log("Connected to server");
+    console.log("Attempting to connect to socket server at:", socketUrl);
+
+    this.socket = io(socketUrl, {
+      transports: ["websocket", "polling"],
+      timeout: 20000,
     });
 
-    this.socket.on("disconnect", () => {
-      console.log("Disconnected from server");
+    this.socket.on("connect", () => {
+      console.log("✅ Connected to socket server successfully");
+      console.log("Socket ID:", this.socket?.id);
+    });
+
+    this.socket.on("disconnect", (reason) => {
+      console.log("❌ Disconnected from socket server:", reason);
+    });
+
+    this.socket.on("connect_error", (error) => {
+      console.error("🔴 Socket connection error:", error);
     });
 
     this.setupEventListeners();
